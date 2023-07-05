@@ -22,14 +22,16 @@ namespace NewspaperSellerSimulation
         }
 
         String TestCasePath = "";
+        bool CaseIsSimulated = false;
+        List<decimal> DayProb = new List<decimal>();
+        List<int> demandList = new List<int>();
+        List<decimal> goodList = new List<decimal>();
+        List<decimal> fairList = new List<decimal>();
+        List<decimal> poorList = new List<decimal>();
         public void readFile(string path)
         {
             simulationSystem = new SimulationSystem();
-            List<decimal> DayProb = new List<decimal>();
-            List<int> demandList = new List<int>();
-            List<decimal> goodList = new List<decimal>();
-            List<decimal> fairList = new List<decimal>();
-            List<decimal> poorList = new List<decimal>();
+           
             try
             {
                 StreamReader sr = new StreamReader(path);
@@ -38,20 +40,20 @@ namespace NewspaperSellerSimulation
                 while (data != null)
                 {
                     if (data == "NumOfNewspapers")
-                        simulationSystem.NumOfNewspapers = Convert.ToInt32(sr.ReadLine());
+                        simulationSystem.NumOfNewspapers = int.Parse(sr.ReadLine());
                     else if (data == "NumOfRecords")
-                        simulationSystem.NumOfRecords = Convert.ToInt32(sr.ReadLine());
+                        simulationSystem.NumOfRecords = int.Parse(sr.ReadLine());
                     else if (data == "PurchasePrice")
-                        simulationSystem.PurchasePrice = Convert.ToDecimal(sr.ReadLine());
+                        simulationSystem.PurchasePrice = decimal.Parse(sr.ReadLine());
                     else if (data == "ScrapPrice")
-                        simulationSystem.ScrapPrice = Convert.ToDecimal(sr.ReadLine());
+                        simulationSystem.ScrapPrice = decimal.Parse(sr.ReadLine());
                     else if (data == "SellingPrice")
-                        simulationSystem.SellingPrice = Convert.ToDecimal(sr.ReadLine());
+                        simulationSystem.SellingPrice = decimal.Parse(sr.ReadLine());
                     else if (data == "DayTypeDistributions")
                     {
                         string[] array = sr.ReadLine().Split(',');
                         for (int i = 0; i < 3; i++)
-                            DayProb.Add(Convert.ToDecimal(array[i]));
+                            DayProb.Add(decimal.Parse(array[i]));
                         simulationSystem.fillTypeOfNewsDay(DayProb);
                     }
                     else if (data == "DemandDistributions")
@@ -60,16 +62,33 @@ namespace NewspaperSellerSimulation
                         while (i < 7)
                         {
                             String[] prob = sr.ReadLine().Split(',');
-                            demandList.Add(Convert.ToInt32(prob[0]));
-                            goodList.Add(Convert.ToDecimal(prob[1]));
-                            fairList.Add(Convert.ToDecimal(prob[2]));
-                            poorList.Add(Convert.ToDecimal(prob[3]));
+                            demandList.Add(int.Parse(prob[0]));
+                            goodList.Add(decimal.Parse(prob[1]));
+                            fairList.Add(decimal.Parse(prob[2]));
+                            poorList.Add(decimal.Parse(prob[3]));
                             i++;
                         }
                     }
                     data = sr.ReadLine();
                 }
                 sr.Close();
+            }
+            catch (Exception x)
+            {
+                Console.WriteLine("Exception in reading form file");
+            }
+        }
+
+        private void SimulateBtn_Click(object sender, EventArgs e)
+        {
+            if (TestCasePath == "")
+            {
+                CaseIsSimulated = false;
+                MessageBox.Show("Please Select TestCase First", "Error");
+            }
+            else
+            {
+                readFile(TestCasePath);
                 simulationSystem.fillDemandDistribution(demandList, goodList, fairList, poorList);
                 simulationSystem.fillSimulationTable();
                 simulationSystem.fillPerformanceMeasure();
@@ -78,49 +97,30 @@ namespace NewspaperSellerSimulation
                 Controls.Add(dataGridView1);
                 string result = TestingManager.Test(simulationSystem, TestCaseName);
                 MessageBox.Show(result);
-            }
-            catch (Exception x)
-            {
-                Console.WriteLine("Exception in reading form file");
+                CaseIsSimulated = true;
             }
         }
 
+        private void Form1_Load(object sender, EventArgs e) {}
 
-        private void SimulateBtn_Click(object sender, EventArgs e)
-        {
-            if (TestCasePath == "")
-            {
-                //   CaseIsSimulated = false;
-                MessageBox.Show("Please Select TestCase First", "Error");
-            }
-            else
-            {
-                readFile(TestCasePath);
-
-            }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            // DataGridView dataGridView1 = new DataGridView();
-        }
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e) {}
 
         private void performance_Click(object sender, EventArgs e)
         {
-            showPerformance performance = new showPerformance();
-            performance.TLost = simulationSystem.PerformanceMeasures.TotalLostProfit;
-            performance.TCost = simulationSystem.PerformanceMeasures.TotalCost;
-            performance.TNetProfit = simulationSystem.PerformanceMeasures.TotalNetProfit;
-            performance.TSales = simulationSystem.PerformanceMeasures.TotalSalesProfit;
-            performance.TScrup = simulationSystem.PerformanceMeasures.TotalScrapProfit;
-            performance.UnSold = simulationSystem.PerformanceMeasures.DaysWithUnsoldPapers;
-            performance.ExDemand = simulationSystem.PerformanceMeasures.DaysWithMoreDemand;
-            performance.Show();
+            if (CaseIsSimulated)
+            {
+                showPerformance performance = new showPerformance();
+                performance.TLost = simulationSystem.PerformanceMeasures.TotalLostProfit;
+                performance.TCost = simulationSystem.PerformanceMeasures.TotalCost;
+                performance.TNetProfit = simulationSystem.PerformanceMeasures.TotalNetProfit;
+                performance.TSales = simulationSystem.PerformanceMeasures.TotalSalesProfit;
+                performance.TScrup = simulationSystem.PerformanceMeasures.TotalScrapProfit;
+                performance.UnSold = simulationSystem.PerformanceMeasures.DaysWithUnsoldPapers;
+                performance.ExDemand = simulationSystem.PerformanceMeasures.DaysWithMoreDemand;
+                performance.Show();
+            }
+            else
+                MessageBox.Show("Please Simulate case First", "Error");
         }
         private void ClearDataGridView()
         {
@@ -132,7 +132,7 @@ namespace NewspaperSellerSimulation
             ClearDataGridView();
             combTestCase.SelectedIndex = -1;
             combTestCase.SelectedText = "";
-            //CaseIsSimulated = false;
+            CaseIsSimulated = false;
         }
     }
 }
