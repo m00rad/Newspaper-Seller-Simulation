@@ -15,8 +15,8 @@ namespace NewspaperSellerModels
             DemandDistributions = new List<DemandDistribution>();
             SimulationTable = new List<SimulationCase>();
             PerformanceMeasures = new PerformanceMeasures();
-            //readFile(path);
-
+            // readFile(path);
+            // if we use this function here the system will run successfully but test manager won't do so
         }
         ///////////// INPUTS /////////////
         public int NumOfNewspapers { get; set; }
@@ -34,11 +34,8 @@ namespace NewspaperSellerModels
 
         //Random instance
         Random random = new Random();
-
-
         public void fillTypeOfNewsDay(List<decimal> probability)
         {
-
             DayTypeDistributions.Add(new DayTypeDistribution());
             DayTypeDistributions[0].Probability = probability[0];
             DayTypeDistributions[0].CummProbability = DayTypeDistributions[0].Probability;
@@ -56,8 +53,6 @@ namespace NewspaperSellerModels
             DayTypeDistributions[0].DayType = Enums.DayType.Good;
             DayTypeDistributions[1].DayType = Enums.DayType.Fair;
             DayTypeDistributions[2].DayType = Enums.DayType.Poor;
-
-
         }
 
         public void fillDemandDistribution(List<int> demand, List<decimal> goodprobability, List<decimal> fairprobability, List<decimal> poorprobability)
@@ -68,25 +63,21 @@ namespace NewspaperSellerModels
             for (int i = 0; i < 3; i++)
             {
                 DemandDistributions[0].DayTypeDistributions.Add(new DayTypeDistribution());
-
                 decimal prob;
                 if (i == 0)
                 {
                     prob = goodprobability[0];
                     DemandDistributions[0].DayTypeDistributions[i].DayType = Enums.DayType.Good;
-
                 }
                 else if (i == 1)
                 {
                     prob = fairprobability[0];
                     DemandDistributions[0].DayTypeDistributions[i].DayType = Enums.DayType.Fair;
-
                 }
                 else
                 {
                     prob = poorprobability[0];
                     DemandDistributions[0].DayTypeDistributions[i].DayType = Enums.DayType.Poor;
-
                 }
                 DemandDistributions[0].DayTypeDistributions[i].Probability = prob;
                 DemandDistributions[0].DayTypeDistributions[i].CummProbability = DemandDistributions[0].DayTypeDistributions[i].Probability;
@@ -97,29 +88,24 @@ namespace NewspaperSellerModels
             {
                 DemandDistributions.Add(new DemandDistribution());
                 DemandDistributions[j].Demand = demand[j];
-
                 for (int i = 0; i < 3; i++)
                 {
                     DemandDistributions[j].DayTypeDistributions.Add(new DayTypeDistribution());
-
                     decimal prob;
                     if (i == 0)
                     {
                         prob = goodprobability[j];
                         DemandDistributions[j].DayTypeDistributions[i].DayType = Enums.DayType.Good;
-
                     }
                     else if (i == 1)
                     {
                         prob = fairprobability[j];
                         DemandDistributions[j].DayTypeDistributions[i].DayType = Enums.DayType.Fair;
-
                     }
                     else
                     {
                         prob = poorprobability[j];
                         DemandDistributions[j].DayTypeDistributions[i].DayType = Enums.DayType.Poor;
-
                     }
                     DemandDistributions[j].DayTypeDistributions[i].Probability = prob;
                     DemandDistributions[j].DayTypeDistributions[i].CummProbability = DemandDistributions[j - 1].DayTypeDistributions[i].CummProbability + DemandDistributions[j].DayTypeDistributions[i].Probability;
@@ -129,8 +115,6 @@ namespace NewspaperSellerModels
 
                 }
             }
-
-
         }
 
         private Enums.DayType Get_type_of_newDay(int RandomNewsDayType)
@@ -139,9 +123,7 @@ namespace NewspaperSellerModels
             for (int i = 0; i < len; i++)
             {
                 if (RandomNewsDayType >= DayTypeDistributions[i].MinRange && RandomNewsDayType <= DayTypeDistributions[i].MaxRange)
-                {
                     return DayTypeDistributions[i].DayType;
-                }
             }
             return 0;
         }
@@ -152,24 +134,17 @@ namespace NewspaperSellerModels
             for (int j = 0; j < 3; j++)
             {
                 if (DemandDistributions[0].DayTypeDistributions[j].DayType == type)
-                {
                     t = j;
-                }
             }
             for (int i = 0; i < len; i++)
             {
                 if (RandomDemand >= DemandDistributions[i].DayTypeDistributions[t].MinRange && RandomDemand <= DemandDistributions[i].DayTypeDistributions[t].MaxRange)
-                {
                     return DemandDistributions[i].Demand;
-
-                }
             }
             return 0;
         }
         public void fillSimulationTable()
         {
-
-
             for (int i = 0; i < NumOfRecords; i++)
             {
                 SimulationTable.Add(new SimulationCase());
@@ -187,9 +162,6 @@ namespace NewspaperSellerModels
                 SimulationTable[i].DailyCost = NumOfNewspapers * PurchasePrice;
 
             }
-
-
-
         }
         public void fillPerformanceMeasure()
         {
@@ -203,12 +175,10 @@ namespace NewspaperSellerModels
                     PerformanceMeasures.DaysWithMoreDemand++;
                 if (SimulationTable[i].ScrapProfit != 0)
                     PerformanceMeasures.DaysWithUnsoldPapers++;
-
             }
             PerformanceMeasures.TotalCost = NumOfRecords * (NumOfNewspapers * PurchasePrice);
-
         }
-
+        
         public void readFile(string path)
         {
             List<decimal> DayProb = new List<decimal>();
@@ -224,20 +194,20 @@ namespace NewspaperSellerModels
                 while (data != null)
                 {
                     if (data == "NumOfNewspapers")
-                        NumOfNewspapers = Convert.ToInt32(sr.ReadLine());
+                        NumOfNewspapers = int.Parse(sr.ReadLine());
                     else if (data == "NumOfRecords")
-                        NumOfRecords = Convert.ToInt32(sr.ReadLine());
+                        NumOfRecords = int.Parse(sr.ReadLine());
                     else if (data == "PurchasePrice")
-                        PurchasePrice = Convert.ToDecimal(sr.ReadLine());
+                        PurchasePrice = decimal.Parse(sr.ReadLine());
                     else if (data == "ScrapPrice")
-                        ScrapPrice = Convert.ToDecimal(sr.ReadLine());
+                        ScrapPrice = decimal.Parse(sr.ReadLine());
                     else if (data == "SellingPrice")
-                        SellingPrice = Convert.ToDecimal(sr.ReadLine());
+                        SellingPrice = decimal.Parse(sr.ReadLine());
                     else if (data == "DayTypeDistributions")
                     {
                         string[] array = sr.ReadLine().Split(',');
                         for (int i = 0; i < 3; i++)
-                            DayProb.Add(Convert.ToDecimal(array[0]));
+                            DayProb.Add(decimal.Parse(array[i]));
                         fillTypeOfNewsDay(DayProb);
                     }
                     else if (data == "DemandDistributions")
@@ -246,10 +216,10 @@ namespace NewspaperSellerModels
                         while (i < 7)
                         {
                             String[] prob = sr.ReadLine().Split(',');
-                            demandList.Add(Convert.ToInt32(prob[0]));
-                            goodList.Add(Convert.ToDecimal(prob[1]));
-                            fairList.Add(Convert.ToDecimal(prob[2]));
-                            poorList.Add(Convert.ToDecimal(prob[3]));
+                            demandList.Add(int.Parse(prob[0]));
+                            goodList.Add(decimal.Parse(prob[1]));
+                            fairList.Add(decimal.Parse(prob[2]));
+                            poorList.Add(decimal.Parse(prob[3]));
                             i++;
                         }
                     }
